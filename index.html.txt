@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Synapssa v44 | Suwerenny System Scalony</title>
+    <style>
+        :root { --gold: #d4af37; --card: rgba(10, 10, 10, 0.96); --text: #f0f0f0; }
+        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: #000; color: var(--text); }
+
+        /* TŁA STABILNE */
+        .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; background-attachment: fixed; transition: opacity 0.8s; z-index: -2; }
+        #bg-narcyz { background-image: url('9966.jpg'); opacity: 1; }
+        #bg-dog { background-image: url('10603.jpg'); opacity: 0; }
+        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.82); z-index: -1; }
+
+        /* EKRAN STARTOWY / ŚLUZA */
+        #gate-screen { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        #app { display: none; padding: 40px 20px; max-width: 1250px; margin: auto; }
+        .box { text-align:center; border: 1px solid var(--gold); padding: 35px; background: var(--card); border-radius: 15px; max-width: 450px; width: 95%; backdrop-filter: blur(12px); box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        
+        .btn-gold { padding:14px; border:1px solid var(--gold); cursor:pointer; font-weight:bold; background: transparent; color: var(--gold); text-transform:uppercase; margin: 8px 0; width: 100%; transition: 0.3s; letter-spacing: 1px; }
+        .btn-gold:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+        
+        select, input, textarea { width:100%; padding:12px; margin:8px 0; background:rgba(15,15,15,0.9); border:1px solid #444; color:#fff; box-sizing: border-box; font-family: inherit; }
+
+        /* PANEL GŁÓWNY */
+        .sciezki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .sciezka-card { background: var(--card); border: 1px solid #333; padding: 35px; border-radius: 20px; border-top: 5px solid var(--gold); text-align: center; }
+        .agent-icon { width: 130px; height: 130px; margin: 0 auto 20px; border-radius: 50%; border: 3px solid var(--gold); overflow: hidden; cursor: pointer; box-shadow: 0 0 20px var(--gold); }
+        .agent-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* PANEL ADMINA / POSTĘPU */
+        #admin-section { margin-top: 60px; padding: 40px; border-top: 3px double var(--gold); background: rgba(5, 5, 5, 0.98); border-radius: 25px; border: 1px solid #222; }
+        .progress-container { width: 100%; background: #111; border-radius: 10px; height: 16px; margin: 12px 0; overflow: hidden; border: 1px solid #333; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #8a6d3b, var(--gold)); width: 0%; transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .docs-list { list-style: none; padding: 0; text-align: left; }
+        .doc-item { background: rgba(255,255,255,0.02); margin: 10px 0; padding: 14px; border-radius: 8px; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.9rem; border: 1px solid transparent; transition: 0.3s; }
+        .doc-item:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.08); }
+        .doc-item.done { color: #2ecc71; border-color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+<div id="bg-narcyz" class="bg-layer"></div>
+<div id="bg-dog" class="bg-layer"></div>
+<div class="bg-overlay"></div>
+
+<div id="gate-screen">
+    <div class="box" id="login-box">
+        <h2 style="color:var(--gold); font-style: italic; letter-spacing: 4px; margin-bottom: 5px;">SYNAPSSA</h2>
+        <p style="font-size: 0.7rem; color: #888; margin-bottom: 25px;">SYSTEM WERYFIKACJI UPRAWNIONYCH</p>
+        
+        <div id="initial-menu">
+            <button class="btn-gold" onclick="showView('verify-view')">1. ZŁÓŻ CERTYFIKAT (DLA NOWYCH)</button>
+            <button class="btn-gold" onclick="showView('login-view')">2. LOGOWANIE (MAM HASŁO)</button>
+        </div>
+
+        <div id="verify-view" style="display:none;">
+            <p style="font-size:0.75rem;">Wgraj certyfikat suwerenności do weryfikacji przez Sarę.</p>
+            <input type="text" id="reg-id" placeholder="Twój Pseudonim">
+            <input type="file" id="reg-file">
+            <button class="btn-gold" onclick="sendCert()">WYŚLIJ DO SARY</button>
+            <button style="background:none; border:none; color:#555; cursor:pointer; font-size:0.7rem;" onclick="showView('initial-menu')">POWRÓT</button>
+        </div>
+
+        <div id="login-view" style="display:none;">
+            <select id="user-role">
+                <option value="BENEFICJENT">FORMA: BENEFICJENT</option>
+                <option value="UPRAWNIONA">FORMA: UPRAWNIONA</option>
+                <option value="ADMIN">FORMA: ADMIN (SARA SIKORA)</option>
+            </select>
+            <input type="text" id="user-name" placeholder="Pseudonim">
+            <input type="password" id="user-pass" placeholder="Hasło od Sary">
+            <button class="btn-gold" onclick="enterSystem()">WEJDŹ DO ŚCIEŻEK</button>
+            <button style="background:none; border:none; color:#555; cursor:pointer; font-size:0.7rem;" onclick="showView('initial-menu')">POWRÓT</button>
+        </div>
+    </div>
+</div>
+
+<div id="app">
+    <div style="display:flex; justify-content:space-between; color:var(--gold); margin-bottom:25px; border-bottom: 2px solid #333; padding-bottom: 15px; font-size: 0.85rem;">
+        <span>FORMA: <b id="display-role"></b> | ID: <b id="display-id"></b></span>
+        <button onclick="location.reload()" style="background:none; border:1px solid var(--gold); color:var(--gold); cursor:pointer; padding: 5px 15px;">WYLOGUJ</button>
+    </div>
+
+    <div class="sciezki-grid">
+        <div class="sciezka-card">
+            <h3 style="color:var(--gold);">I. ŚCIEŻKA DUCHA</h3>
+            <div class="agent-icon" onclick="startBreathing()"><img src="10603.jpg"></div>
+            <p style="font-size:0.75rem; letter-spacing: 1px;">TRENING ODDECHOWY 3-3-3</p>
+        </div>
+        <div class="sciezka-card">
+            <h3 style="color:var(--gold);">II. ŚCIEŻKA WIEDZY</h3>
+            <p style="font-size:0.85rem; margin-top: 20px;">DOKUMENTACJA R&D I STATUT</p>
+            <button class="btn-gold" style="font-size:0.7rem; margin-top: 25px;">POBIERZ ZASOBY</button>
+        </div>
+        <div class="sciezka-card">
+            <h3 style="color:var(--gold);">III. ŚCIEŻKA CZYNU</h3>
+            <textarea id="rep-box" placeholder="Raport operacyjny / Materiały do Sary..."></textarea>
+            <button class="btn-gold" style="font-size:0.7rem;" onclick="sendReport()">WYŚLIJ DO ADMINA</button>
+        </div>
+    </div>
+
+    <div id="admin-section">
+        <h3 style="color:var(--gold); text-align:center; letter-spacing:4px; margin-bottom:30px;">CENTRALNY PANEL KONTROLI POSTĘPU</h3>
+        <div id="progress-area"></div>
+
+        <div id="admin-comms" style="margin-top:40px; border-top:1px solid #333; padding-top:30px; display:none;">
+            <h4 style="color:var(--gold); letter-spacing: 2px;">KOMUNIKACJA Z UŻYTKOWNIKAMI</h4>
+            <select id="target-user">
+                <option value="ALL">DO WSZYSTKICH</option>
+                <option value="BENEFICJENCI">DO BENEFICJENTÓW</option>
+                <option value="UPRAWNIONE">DO UPRAWNIONYCH</option>
+            </select>
+            <textarea id="admin-msg" placeholder="Wiadomość systemowa od Pani Sary..."></textarea>
+            <button class="btn-gold" onclick="adminBroadcast()">WYŚLIJ WIADOMOŚĆ (MAIL)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SARA_MAIL = "sikorasara135@gmail.com";
+
+    function showView(viewId) {
+        document.getElementById('initial-menu').style.display = 'none';
+        document.getElementById('verify-view').style.display = 'none';
+        document.getElementById('login-view').style.display = 'none';
+        document.getElementById(viewId).style.display = 'block';
+    }
+
+    function sendCert() {
+        const id = document.getElementById('reg-id').value;
+        const file = document.getElementById('reg-file').files[0];
+        if(!id || !file) { alert("Podaj pseudonim i załącz plik!"); return; }
+        
+        const body = `WNIOSEK O HASŁO\nPseudonim: ${id}\nPlik: ${file.name}\nProszę o weryfikację.`;
+        window.location.href = `mailto:${SARA_MAIL}?subject=CERTYFIKAT: ${id}&body=${encodeURIComponent(body)}`;
+        alert("Certyfikat wysłany. Oczekuj na hasło od Pani Sary.");
+        showView('initial-menu');
+    }
+
+    function enterSystem() {
+        const id = document.getElementById('user-name').value;
+        const pass = document.getElementById('user-pass').value;
+        const role = document.getElementById('user-role').value;
+        if(!id || !pass) return;
+
+        document.getElementById('display-id').innerText = id;
+        document.getElementById('display-role').innerText = role;
+        document.getElementById('gate-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('bg-narcyz').style.opacity = '0';
+        document.getElementById('bg-dog').style.opacity = '1';
+
+        if(role === "ADMIN") document.getElementById('admin-comms').style.display = "block";
+        loadProgress(role);
+    }
+
+    function loadProgress(role) {
+        const area = document.getElementById('progress-area');
+        const tasks = {
+            "BENEFICJENT": ["Statut Fundacji Synapssa", "Deklaracja Etyki Suwerena", "Metodyka R&D", "Pierwszy Raport"],
+            "UPRAWNIONA": ["Certyfikat Dostępu", "Protokół Ścieżki II", "Analiza Low-Risk AI", "Zatwierdzenie Operacyjne", "Weryfikacja Beneficjenta"],
+            "ADMIN": ["Globalny Nadzór Systemu", "Baza Hasieł", "Weryfikacja Dokumentacji", "Zarządzanie Ścieżką Czyń"]
+        };
+        const currentTasks = tasks[role] || tasks["BENEFICJENT"];
+        
+        let html = `<div style="margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:var(--gold);"><span>POSTĘP ŚCIEŻKI: ${role}</span> <span id="p-val">0%</span></div>
+            <div class="progress-container"><div id="p-bar" class="progress-bar"></div></div>
+            <ul class="docs-list">`;
+        
+        currentTasks.forEach((t, i) => {
+            let p = Math.round(((i + 1) / currentTasks.length) * 100);
+            html += `<li class="doc-item" onclick="updateProg(${p}, this)">${i+1}. ${t} <span>[OTWÓRZ I ZATWIERDŹ]</span></li>`;
+        });
+        area.innerHTML = html + `</ul></div>`;
+    }
+
+    function updateProg(v, el) {
+        if(el.classList.contains('done')) return;
+        document.getElementById('p-bar').style.width = v + '%';
+        document.getElementById('p-val').innerText = v + '%';
+        el.classList.add('done');
+        el.querySelector('span').innerText = "[ZATWIERDZONO ✓]";
+    }
+
+    function startBreathing() {
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance("Spokojnie, oddychaj na trzy. Wdech: raz, dwa, trzy. Wstrzymaj: raz, dwa, trzy. Wydech: raz, dwa, trzy. Powtarzaj w spokoju.");
+        msg.lang = 'pl-PL'; msg.rate = 0.9;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function adminBroadcast() {
+        const target = document.getElementById('target-user').value;
+        const message = document.getElementById('admin-msg').value;
+        window.location.href = `mailto:?subject=Komunikat Synapssa: ${target}&body=${encodeURIComponent(message)}`;
+    }
+
+    function sendReport() {
+        const t = document.getElementById('rep-box').value;
+        window.location.href = `mailto:${SARA_MAIL}?subject=Raport Operacyjny&body=${encodeURIComponent(t)}`;
+    }
+</script>
+</body>
+</html>
