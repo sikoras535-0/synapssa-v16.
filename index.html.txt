@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapssa v25 | Active Materials</title>
+    <style>
+        :root { --gold: #d4af37; --card: rgba(10, 10, 10, 0.96); --text: #f0f0f0; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; color: var(--text); overflow-x: hidden; }
+        .bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('10603.jpg') no-repeat center center fixed; background-size: cover; filter: brightness(0.15); z-index: -1; }
+        
+        #gate { position: fixed; top:0; left:0; width:100%; height:100%; background:#000; display:flex; justify-content:center; align-items:center; z-index:9999; }
+        .gate-box { text-align:center; border:1px solid var(--gold); padding:40px; background: #050505; border-radius: 12px; }
+
+        .btn-gold-italic { 
+            padding:12px 20px; border:1px solid var(--gold); cursor:pointer; font-weight:bold; font-style: italic; 
+            background: transparent; color: var(--gold); text-transform:uppercase; margin: 10px 0; transition: 0.3s; display: block; width: 100%;
+        }
+        .btn-gold-italic:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+
+        #app { display:none; padding:20px; max-width:1150px; margin:auto; text-align: center; }
+        
+        .progress-container { width: 100%; background: #222; border: 1px solid var(--gold); height: 25px; margin: 15px 0; border-radius: 12px; overflow: hidden; position: relative; }
+        #progress-bar { height: 100%; background: var(--gold); width: 0%; transition: 0.8s ease; }
+        #progress-text { position: absolute; width: 100%; text-align: center; top: 0; font-size: 0.7rem; line-height: 25px; color: #fff; font-weight: bold; }
+
+        .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; margin-bottom: 15px; }
+        .agent-icon { width: 140px; height: 140px; margin: 15px auto; border-radius: 50%; border: 3px solid var(--gold); overflow: hidden; cursor: pointer; box-shadow: 0 0 25px var(--gold); }
+        .agent-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px; text-align: left; }
+        .card { background: var(--card); border: 1px solid #222; padding: 20px; border-radius: 12px; border-top: 3px solid var(--gold); display: flex; flex-direction: column; }
+        
+        input, textarea { width:100%; padding:12px; margin:8px 0; background:#111; border:1px solid #333; color:#fff; box-sizing: border-box; border-radius: 4px; }
+        .file-link { color: var(--gold); text-decoration: none; font-size: 0.85rem; padding: 5px 0; display: block; border-bottom: 1px solid #222; }
+        .file-link:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+<div class="bg"></div>
+
+<div id="gate">
+    <div class="gate-box">
+        <h2 style="color:var(--gold); letter-spacing: 5px;">SYNAPSSA SYSTEM</h2>
+        <input type="password" id="master-pass" placeholder="HASŁO DOSTĘPU">
+        <button class="btn-gold-italic" onclick="login('ADMIN')">Dostęp: ADMIN</button>
+        <button class="btn-gold-italic" onclick="login('USER_')">Dostęp: USER_</button>
+        <button class="btn-gold-italic" onclick="login('UPRAWNIONA')">Dostęp: UPRAWNIONA</button>
+    </div>
+</div>
+
+<div id="app">
+    <div class="header-bar">
+        <span style="font-size: 0.7rem; color: var(--gold);">SYSTEM ACTIVE | <b id="role-display"></b></span>
+        <button class="btn-gold-italic" style="width:auto; font-size:0.6rem; padding: 5px 15px;" onclick="logout()">WYLOGUJ</button>
+    </div>
+
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+        <div id="progress-text">POSTĘP: 0%</div>
+    </div>
+
+    <div class="agent-icon" onclick="startBreathing()">
+        <img src="10603.jpg" alt="Agent">
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <span style="color:var(--gold); font-weight:bold; font-size:0.8rem; margin-bottom:10px;">BIBLIOTEKA MATERIAŁÓW</span>
+            <div id="materials-list">
+                <a href="#" class="file-link" onclick="downloadNotify('Statut_Fundacji_Synapssa.pdf')">📄 Statut Fundacji Synapssa.pdf</a>
+                <a href="#" class="file-link" onclick="downloadNotify('Przewodnik_IT_Sovereign.pdf')">📄 Przewodnik IT Sovereign.pdf</a>
+                <a href="#" class="file-link" onclick="downloadNotify('AI_Act_Low_Risk_Doc.pdf')">📄 Dokumentacja AI Act Low Risk.pdf</a>
+                <a href="#" class="file-link" onclick="downloadNotify('Metoda_Oddechowa_333.pdf')">📄 Metoda Oddechowa 333.pdf</a>
+            </div>
+        </div>
+
+        <div class="card" id="interaction-card">
+            <span style="color:var(--gold); font-weight:bold; font-size:0.8rem; margin-bottom:10px;">PANEL OPERACYJNY</span>
+            <div id="path-content"></div>
+        </div>
+
+        <div class="card">
+            <span style="color:var(--gold); font-weight:bold; font-size:0.8rem; margin-bottom:10px;">WSPARCIE R&D</span>
+            <p style="font-size: 0.75rem;">Numer konta do wpłat statutowych:</p>
+            <p style="font-family: monospace; color: var(--gold); background: #000; padding: 10px; font-size: 0.8rem;">
+                xxxxxxxxxcccccxxxxxxxxx
+            </p>
+            <audio id="forest" loop src="las.mp3"></audio>
+            <button class="btn-gold-italic" id="fbtn" style="font-size: 0.7rem;" onclick="toggleForest()">SZUM LASU: ON</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let progress = parseInt(localStorage.getItem('syn_progress')) || 0;
+    const adminPass = "Synapssa2026";
+
+    window.onload = () => {
+        updateProgressUI();
+        const r = localStorage.getItem('syn_role');
+        if(r) showApp(r);
+    };
+
+    function login(role) {
+        if(document.getElementById('master-pass').value === adminPass) {
+            localStorage.setItem('syn_role', role);
+            showApp(role);
+        } else { alert("Błąd autoryzacji"); }
+    }
+
+    function logout() {
+        localStorage.removeItem('syn_role');
+        location.reload();
+    }
+
+    function updateProgressUI() {
+        document.getElementById('progress-bar').style.width = progress + "%";
+        document.getElementById('progress-text').innerText = "POSTĘP INTEGRACJI: " + progress + "%";
+        localStorage.setItem('syn_progress', progress);
+    }
+
+    function addProgress(val = 1) {
+        if(progress < 100) {
+            progress += val;
+            updateProgressUI();
+        }
+    }
+
+    function downloadNotify(name) {
+        alert("Pobieranie: " + name);
+        addProgress(1);
+    }
+
+    function showApp(role) {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        document.getElementById('role-display').innerText = role;
+        
+        const cnt = document.getElementById('path-content');
+        if(role === 'ADMIN') {
+            cnt.innerHTML = `<p style="font-size:0.8rem;">Zarządzanie zasobami ADMIN.</p><input type="file" id="fup"><button class="btn-gold-italic" style="font-size:0.7rem;" onclick="addProgress(5)">Zatwierdź i Wgraj</button>`;
+        } else if(role === 'UPRAWNIONA') {
+            cnt.innerHTML = `
+                <p style="font-size:0.8rem;"><b>DODAJ NOWY MATERIAŁ:</b></p>
+                <textarea id="uprawnionaMsg" placeholder="Opisz materiał lub wklej treść..."></textarea>
+                <button class="btn-gold-italic" style="font-size:0.7rem;" onclick="sendToSara('Uprawniona')">Wyślij materiał do Sary</button>
+            `;
+        } else {
+            cnt.innerHTML = `
+                <p style="font-size:0.8rem;"><b>KONTAKT Z FUNDACJĄ:</b></p>
+                <textarea id="userMsg" placeholder="Zadaj pytanie lub prześlij opinię..."></textarea>
+                <button class="btn-gold-italic" style="font-size:0.7rem;" onclick="sendToSara('User')">Wyślij zapytanie</button>
+            `;
+        }
+    }
+
+    function sendToSara(type) {
+        const msg = document.getElementById(type === 'Uprawniona' ? 'uprawnionaMsg' : 'userMsg').value;
+        if(!msg) { alert("Wpisz treść!"); return; }
+        addProgress(1);
+        const subject = encodeURIComponent("Nowy materiał od: " + type);
+        const body = encodeURIComponent(msg);
+        window.location.href = `mailto:sikorasara135@gmail.com?subject=${subject}&body=${body}`;
+        alert("Wiadomość przygotowana do wysłania. Postęp +1%");
+    }
+
+    function startBreathing() {
+        window.speechSynthesis.cancel();
+        const m = new SpeechSynthesisUtterance("Spokojnie, oddychaj na trzy. Wdech: raz, dwa, trzy. Wstrzymaj: raz, dwa, trzy. Wydech: raz, dwa, trzy.");
+        m.lang = 'pl-PL'; m.rate = 1.5; m.pitch = 1.2;
+        window.speechSynthesis.speak(m);
+    }
+
+    function toggleForest() {
+        const a = document.getElementById('forest');
+        const b = document.getElementById('fbtn');
+        if(a.paused) { a.play(); b.innerText = "SZUM LASU: OFF"; }
+        else { a.pause(); b.innerText = "SZUM LASU: ON"; }
+    }
+</script>
+
+</body>
+</html>
